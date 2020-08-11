@@ -4,8 +4,8 @@ const output = require("../functions/output");
 const missingKey = require("../functions/missingKey");
 const jwt = require("jsonwebtoken");
 const mailgun = require("mailgun-js");
-const DOMAIN = "sandboxc2dc03294e5442459f774748cc014700.mailgun.org";
-const mg = mailgun({ apiKey: "e96f52331d5923f73cf66f8645ad55c6-07e45e2a-1ed19990", domain: DOMAIN });
+const DOMAIN = process.env.MAILGUN_DOMAIN;
+const mg = mailgun({ apiKey: process.env.MAILGUN_APIKEY, domain: DOMAIN });
 const crypto = require("crypto");
 const Speakeasy = require("speakeasy");
 
