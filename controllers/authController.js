@@ -3,7 +3,11 @@ const async = require("async");
 const output = require("../functions/output");
 const missingKey = require("../functions/missingKey");
 const jwt = require("jsonwebtoken");
+const mailgun = require("mailgun-js");
+const DOMAIN = "sandboxc2dc03294e5442459f774748cc014700.mailgun.org";
+const mg = mailgun({ apiKey: "e96f52331d5923f73cf66f8645ad55c6-07e45e2a-1ed19990", domain: DOMAIN });
 const crypto = require("crypto");
+const Speakeasy = require("speakeasy");
 
 
 exports.signUp = (req, res) => {
@@ -235,4 +239,160 @@ exports.signIn = (req, res) => {
         }
         return output.print(req, res, result);
     })
-}
+};
+
+exports.forgotPassword = (req, res) => {
+    async.waterfall([
+        function checkMissingKey(callback) {
+            let missingKeys = [];
+            missingKeys = missingKey({
+                email: req.body.email
+            });
+
+            if (missingKeys.length !== 0) {
+                return callback({
+                    code: "MISSING_KEY",
+                    data: {
+                        missingKeys
+                    }
+                })
+            }
+
+            callback(null, true);
+        },
+
+        function checkUser(index, callback) {
+            userModel.findOne({ email: req.body.email })
+                .then(user => {
+                    if (!user) {
+                        return callback({
+                            code: "INVALID_REQUEST",
+                            data: "Email not found"
+                        })
+                    }
+
+                    callback(null, user);
+                })
+        },
+
+        function generateSecret(user, callback) {
+            const secret = Speakeasy.generateSecret({ length: 20 });
+            callback(null, secret, user);
+        },
+
+        function generateTotp(secret, user, callback) {
+            var token = Speakeasy.totp({
+                secret: secret.base32,
+                encoding: "base32",
+                // leave time field 
+                step: 600,
+                window: 0
+            });
+            callback(null, user, secret, token);
+        },
+
+        function insertSecretTotp(user, secret, token, callback) {
+            userModel.findOneAndUpdate({ email: user.email }, { $set: { resetTotp: secret.base32 } })
+                .then(res => {
+                    if (res) {
+                        callback(null, token, user);
+                    }
+                })
+        },
+
+        function sendTokenToEmail(token, user, callback) {
+            const data = {
+                from: "Mailgun Sandbox <postmaster@sandboxc2dc03294e5442459f774748cc014700.mailgun.org>",
+                to: user.email,
+                subject: "Otp Password",
+                html: `<p>Please insert this otp ${token} for 30 seconds</p>`
+            };
+
+            mg.messages().send(data, function (error, body) {
+                if (!error) {
+                    return callback({
+                        code: "OK",
+                        data: "otp has been send"
+                    })
+                }
+            });
+        }
+
+
+    ], (err, result) => {
+        if (err) {
+            return output.print(req, res, err);
+        }
+        return output.print(req, res, result);
+    })
+},
+
+    exports.resetPassword = (req, res) => {
+        async.waterfall([
+            function checkMissingKey(callback) {
+                let missingKeys = [];
+                missingKeys = missingKey({
+                    email: req.body.email,
+                    token: req.body.token
+                });
+
+                if (missingKeys.length !== 0) {
+                    return callback({
+                        code: "MISSING_KEY",
+                        data: {
+                            missingKeys
+                        }
+                    })
+                }
+
+                callback(null, true);
+            },
+
+            function checkUser(index, callback) {
+                userModel.findOne({ email: req.body.email })
+                    .then(user => {
+                        if (user) {
+                            callback(null, user);
+                        } else {
+                            return callback({
+                                code: "INVALID_REQUEST",
+                                data: "Email invalid"
+                            })
+                        }
+                    })
+            },
+
+            function checkTotpToken(user, callback) {
+                userModel.findOne({ email: user.email })
+                    .then(res => {
+                        if (res) {
+                            var token = user.resetTotp.toString();
+                            var verifyToken = Speakeasy.totp.verify({
+                                secret: token,
+                                encoding: "base32",
+                                token: req.body.token,
+                                step: 600,
+                                window: 0
+                            });
+                            if (verifyToken) {
+                                callback(null, user);
+                            } else {
+                                return callback({
+                                    code: "INVALID_REQUEST",
+                                    data: "Otp is invalid"
+                                })
+                            }
+
+                        }
+                    })
+            },
+
+           
+
+        ], (err, result) => {
+            if (err) {
+                return output.print(req, res, err);
+            }
+            return output.print(req, res, result);
+        })
+    }

@@ -40,6 +40,14 @@ const userSchema = new Schema({
     indication: {
         type: String,
         required: true
+    },
+    resetLink:{
+        data:String,
+        default:""
+    },
+    resetTotp:{
+        data:String,
+        default:""
     }
 });
 
