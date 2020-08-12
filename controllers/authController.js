@@ -314,7 +314,7 @@ exports.forgotPassword = (req, res) => {
             var mailOptions = {
                 from: process.env.EMAIL_USER,
                 to: user.email,
-                subject: 'OTP Password',
+                subject: 'OTP Reset Password',
                 html: `<p>Please insert this otp ${token}, this OTP will expire in 10 minutes</p>`
             }
 
