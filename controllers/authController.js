@@ -8,6 +8,7 @@ const DOMAIN = process.env.MAILGUN_DOMAIN;
 const mg = mailgun({ apiKey: process.env.MAILGUN_APIKEY, domain: DOMAIN });
 const crypto = require("crypto");
 const Speakeasy = require("speakeasy");
+const nodemailer = require("nodemailer");
 
 
 exports.signUp = (req, res) => {
@@ -301,18 +302,32 @@ exports.forgotPassword = (req, res) => {
         },
 
         function sendTokenToEmail(token, user, callback) {
-            const data = {
-                from: "Mailgun Sandbox <postmaster@sandboxc2dc03294e5442459f774748cc014700.mailgun.org>",
-                to: user.email,
-                subject: "Otp Password",
-                html: `<p>Please insert this otp ${token} for 30 seconds</p>`
-            };
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASSWORD
+                }
+            });
 
-            mg.messages().send(data, function (error, body) {
-                if (!error) {
+
+            var mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: user.email,
+                subject: 'OTP Password',
+                html: `<p>Please insert this otp ${token}, this OTP will expire in 10 minutes</p>`
+            }
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    return callback({
+                        code: "INVALID_REQUEST",
+                        data: error
+                    })
+                } else {
                     return callback({
                         code: "OK",
-                        data: "otp has been send"
+                        data: "Otp has been sent to email"
                     })
                 }
             });
@@ -333,7 +348,8 @@ exports.forgotPassword = (req, res) => {
                 let missingKeys = [];
                 missingKeys = missingKey({
                     email: req.body.email,
-                    token: req.body.token
+                    token: req.body.token,
+                    password: req.body.password
                 });
 
                 if (missingKeys.length !== 0) {
@@ -356,7 +372,7 @@ exports.forgotPassword = (req, res) => {
                         } else {
                             return callback({
                                 code: "INVALID_REQUEST",
-                                data: "Email invalid"
+                                data: "Email not found"
                             })
                         }
                     })
@@ -375,7 +391,7 @@ exports.forgotPassword = (req, res) => {
                                 window: 0
                             });
                             if (verifyToken) {
-                                callback(null, user);
+                                callback(null, true);
                             } else {
                                 return callback({
                                     code: "INVALID_REQUEST",
@@ -387,8 +403,39 @@ exports.forgotPassword = (req, res) => {
                     })
             },
 
-           
 
+            function validation(index, callback) {
+                // Validation password
+                const passwordRegx = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$/;
+                const password = req.body.password;
+
+                if (!password.match(passwordRegx)) {
+                    return callback({
+                        code: "INVALID_REQUEST",
+                        data:
+                            "Password invalid, must be containing lowercase, uppercase, number, and 8 char"
+                    });
+                }
+
+                callback(null, true);
+            },
+
+            function updatePassword(index, callback) {
+                userModel.findOneAndUpdate({ email: req.body.email }, { $set: { password: req.body.password, resetTotp: "" } })
+                    .then(res => {
+                        if (res) {
+                            return callback({
+                                code: "OK",
+                                data: "Password has been changed"
+                            })
+                        }
+                    }).catch(err => {
+                        return callback({
+                            code: "ERR_DATABASE",
+                            data: err
+                        });
+                    });
+            }
         ], (err, result) => {
             if (err) {
                 return output.print(req, res, err);
