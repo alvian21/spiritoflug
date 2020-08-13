@@ -2,10 +2,14 @@ const userModel = require('../models/user');
 const async = require("async");
 const output = require("../functions/output");
 const missingKey = require("../functions/missingKey");
+const path = require("path");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const Speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
+const handlebars = require("handlebars");
+const fs = require("fs");
+const readHTMLFile = require("../functions/readHTMLFile");
 
 
 exports.signUp = (req, res) => {
@@ -307,27 +311,40 @@ exports.forgotPassword = (req, res) => {
                 }
             });
 
-
-            var mailOptions = {
-                from: process.env.EMAIL_USER,
-                to: user.email,
-                subject: 'OTP Reset Password',
-                html: `<p>Please insert this otp ${token}, this OTP will expire in 10 minutes</p>`
-            }
-
-            transporter.sendMail(mailOptions, function (error, info) {
-                if (error) {
-                    return callback({
-                        code: "INVALID_REQUEST",
-                        data: error
-                    })
-                } else {
-                    return callback({
-                        code: "OK",
-                        data: "Otp has been sent to email"
-                    })
+            readHTMLFile(path.resolve("./public/html/forgot.html"),function(err, html){
+                const template = handlebars.compile(html);
+                const replacement = {
+                    username: user.username,
+                    token:token,
+                    images:path.resolve("./public/images/logo_splash.png")
+                };
+                const htmlToSend = template(replacement);
+                var mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: user.email,
+                    subject: 'OTP Reset Password',
+                    html: htmlToSend
+                    // html: `<p>Please insert this otp ${token}, this OTP will expire in 10 minutes</p>`
                 }
-            });
+
+                transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        return callback({
+                            code: "INVALID_REQUEST",
+                            data: error
+                        })
+                    } else {
+                        return callback({
+                            code: "OK",
+                            data: "Otp has been sent to email"
+                        })
+                    }
+                });
+            })
+
+            
+
+           
         }
 
 
