@@ -22,6 +22,7 @@ connection.once('open',()=>{
 });
 
 app.use(upload());
+app.use("/uploads",express.static("uploads"));
 app.use(bodyParser.json({ limit: process.env.JSON_LIMIT }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
