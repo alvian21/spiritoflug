@@ -23,6 +23,13 @@ const fs = require("fs");
 const generateFileName = require('../functions/generateFileName');
 const moveFile = require("../functions/moveFile");
 const checkImageExt = require("../functions/checkImageExt");
+const jsftp = require("jsftp");
+const Ftp = new jsftp({
+    host: process.env.FTP_HOSTNAME,
+    port: process.env.FTP_PORT,
+    user: process.env.FTP_USERNAME,
+    pass: process.env.FTP_PASSWORD
+});
 
 exports.create = (req, res) => {
     async.waterfall([
@@ -64,21 +71,23 @@ exports.create = (req, res) => {
                     data: "Image type invalid"
                 });
             }
+            const name = generateFileName(req.files.image);
+       
 
-            const filename = "./uploads/activity/" + generateFileName(req.files.image);
 
-            moveFile(req.files.image, filename, err => {
-                if (err) {
+            Ftp.put(req.files.image.data, "/htdocs/images/activity/" + name, err => {
+                if (!err) {
+                    const filename = process.env.CDN_URL +"/images/activity/" + name +"?i=1";
+                    req.body.image = filename;
+                    callback(null, true);
+                } else {
                     return callback({
                         code: "GENERAL_ERR",
                         data: err
                     })
-                } else {
-                    req.body.image = filename;
-                    callback(null, true);
-                   
                 }
-            });
+
+            })
         },
 
         function insert(index, callback) {

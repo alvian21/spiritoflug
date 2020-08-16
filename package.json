@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.10",
     "handlebars": "^4.7.6",
+    "jsftp": "^2.1.3",
     "jsonwebtoken": "^8.5.1",
     "mailgun-js": "^0.22.0",
     "moment": "^2.27.0",
