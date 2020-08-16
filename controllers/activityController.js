@@ -4,17 +4,6 @@ const output = require("../functions/output");
 const missingKey = require("../functions/missingKey");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "./uploads/activity/");
-    },
-    filename: function (req, file, cb) {
-        cb(null, new Date().toISOString + file.originalname);
-    }
-
-});
-const upload = multer({ storage: storage });
 const crypto = require("crypto");
 const Speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
