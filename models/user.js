@@ -48,6 +48,10 @@ const userSchema = new Schema({
     resetTotp:{
         data:String,
         default:""
+    },
+    role:{
+        type:String,
+        default:""
     }
 });
 

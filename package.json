@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "accesscontrol": "^2.2.1",
     "async": "^3.2.0",
     "axios": "^0.19.2",
     "body-parser": "^1.19.0",
@@ -24,8 +25,13 @@
     "mailgun-js": "^0.22.0",
     "moment": "^2.27.0",
     "mongoose": "^5.9.28",
+    "mongoose-data-seed": "^2.1.6",
     "multer": "^1.4.2",
     "nodemailer": "^6.4.11",
     "speakeasy": "^2.0.0"
+  },
+  "mdSeed": {
+    "seedersFolder": "./seeders",
+    "customSeederTemplate": "./seeders/md-seed.admin.js"
   }
 }

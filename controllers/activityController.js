@@ -61,12 +61,12 @@ exports.create = (req, res) => {
                 });
             }
             const name = generateFileName(req.files.image);
-       
+
 
 
             Ftp.put(req.files.image.data, "/htdocs/images/activity/" + name, err => {
                 if (!err) {
-                    const filename = process.env.CDN_URL +"/images/activity/" + name +"?i=1";
+                    const filename = process.env.CDN_URL + "/images/activity/" + name + "?i=1";
                     req.body.image = filename;
                     callback(null, true);
                 } else {
@@ -105,4 +105,35 @@ exports.create = (req, res) => {
         }
         return output.print(req, res, result);
     })
+},
+
+exports.view = (req, res) => {
+        async.waterfall([
+            function viewData(callback) {
+                activityModel.find()
+                    .then(res => {
+                        if (res) {
+                            return callback({
+                                code: "OK",
+                                data: res
+                            })
+                        } else {
+                            return callback({
+                                code: "INVALID_REQUEST",
+                                data: "NOT FOUND"
+                            })
+                        }
+                    }).catch(err => {
+                        return callback({
+                            code: "ERR_DATABASE",
+                            data: err
+                        });
+                    });
+            }
+        ], (err, result) => {
+            if (err) {
+                return output.print(req, res, err);
+            }
+            return output.print(req, res, result);
+        })
 }

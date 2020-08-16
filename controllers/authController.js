@@ -471,4 +471,107 @@ exports.forgotPassword = (req, res) => {
             }
             return output.print(req, res, result);
         })
-    }
+    };
+
+    exports.signInAdmin = (req, res) => {
+        async.waterfall([
+            function checkMissingKey(callback) {
+                let missingKeys = [];
+                missingKeys = missingKey({
+                    username: req.body.username,
+                    password: req.body.password
+                });
+    
+                if (missingKeys.length !== 0) {
+                    return callback({
+                        code: "MISSING_KEY",
+                        data: {
+                            missingKeys
+                        }
+                    });
+                }
+    
+                callback(null, true);
+            },
+    
+            function checkUser(index, callback) {
+                userModel
+                    .findOne({
+                        username: req.body.username
+                    })
+                    .then(res => {
+                        if (!res) {
+                            return callback({
+                                code: "NOT_FOUND",
+                                data: "Username invalid"
+                            });
+                        }
+    
+                        callback(null, res);
+                    })
+                    .catch(err => {
+                        return callback({
+                            code: "ERR_DATABASE",
+                            data: err
+                        });
+                    });
+            },
+    
+            function checkPassword(user, callback) {
+                var mykey = crypto.createDecipher("aes-128-cbc", "mypassword");
+                var mystr = mykey.update(user.password, "hex", "utf8");
+                mystr += mykey.final("utf8");
+    
+                if (mystr !== req.body.password) {
+                    return callback({
+                        code: "INVALID_REQUEST",
+                        data: "Password wrong"
+                    });
+                }
+                callback(null, user);
+            },
+    
+            function generateToken(user, callback) {
+                jwt.sign(
+                    { user: user.email, password: user.password },
+                    "secret",
+                    {
+                        algorithm: "HS256"
+                    },
+                    (err, token) => {
+                        if (err) {
+                            return callback({
+                                code: "GENRAL_ERR",
+                                data: err
+                            });
+                        }
+    
+                        callback(null, token);
+                    }
+                );
+            },
+    
+    
+            function insertTokenToDb(token, callback) {
+                userModel.findOneAndUpdate({ username: req.body.username, role:"admin" },
+                    { $set: { token: token } }, { new: true }, (err, doc) => {
+                        if (!err) {
+                            return callback({
+                                code: "OK",
+                                data: token
+                            })
+                        }
+                    }).catch(err => {
+                        return callback({
+                            code: "ERR_DATABASE",
+                            data: err
+                        });
+                    });
+            }
+        ], (err, result) => {
+            if (err) {
+                return output.print(req, res, err);
+            }
+            return output.print(req, res, result);
+        })
+    };
