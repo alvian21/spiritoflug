@@ -28,6 +28,7 @@ router.use((req, res, next) => {
 });
 
 router.post("/", roleController.grantAccess("createOwn", "activity"), activityController.create);
+router.delete("/:id", roleController.grantAccess("deleteAny", "activity"), activityController.delete);
 router.get("/", roleController.grantAccess("readAny", "activity"), activityController.view);
 
 module.exports = router;

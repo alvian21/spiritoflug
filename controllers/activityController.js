@@ -133,4 +133,60 @@ exports.create = (req, res) => {
             }
             return output.print(req, res, result);
         })
+    },
+
+
+    exports.delete = (req, res) => {
+        async.waterfall([
+            function checkUser(callback) {
+                activityModel.findById({ _id: req.params.id })
+                    .lean().exec(function (err, result) {
+                        if (err) {
+                            return callback({
+                                code: "INVALID_REQUEST",
+                                data: "activity not found"
+                            })
+                        }
+                        callback(null, result);
+
+                    })
+            },
+
+            function deleteImage(result, callback) {
+                const imageName = result.image.replace("https://" + process.env.CDN_URL + "/cdn/images/activity/", "");
+                Ftp.raw("DELE", "/activity/" + imageName, err => {
+                    if (!err) {
+                        callback(null, true);
+                    } else {
+                        return callback({
+                            code: "INVALID_REQUEST",
+                            data: err
+                        })
+                    }
+                })
+
+            },
+
+            function deleteActivity(index, callback) {
+                activityModel.findByIdAndDelete({ _id: req.params.id })
+                    .lean().exec(function (err, result) {
+                        if (!err) {
+                            return callback({
+                                code: "OK",
+                                data: "Activity has been deleted"
+                            })
+                        } else {
+                            return callback({
+                                code: "GENERAL_ERR",
+                                data: err
+                            })
+                        }
+                    })
+            }
+        ], (err, result) => {
+            if (err) {
+                return output.print(req, res, err);
+            }
+            return output.print(req, res, result);
+        })
     }

@@ -324,7 +324,7 @@ exports.forgotPassword = (req, res) => {
                 };
                 const htmlToSend = template(replacement);
                 var mailOptions = {
-                    from: process.env.EMAIL_USER,
+                    from: "Spiritoflug.me" + "<" + process.env.EMAIL_USER + ">",
                     to: user.email,
                     subject: 'OTP Reset Password',
                     html: htmlToSend
