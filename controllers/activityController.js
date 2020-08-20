@@ -63,7 +63,7 @@ exports.create = (req, res) => {
             const name = generateFileName(req.files.image);
             Ftp.put(req.files.image.data, "/activity/" + name, err => {
                 if (!err) {
-                    const filename = process.env.CDN_URL + "/cdn/images/activity/" + name;
+                    const filename = "https://" + process.env.CDN_URL + "/cdn/images/activity/" + name;
                     req.body.image = filename;
                     callback(null, true);
                 } else {
