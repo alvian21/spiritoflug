@@ -61,12 +61,9 @@ exports.create = (req, res) => {
                 });
             }
             const name = generateFileName(req.files.image);
-
-
-
-            Ftp.put(req.files.image.data, "/htdocs/images/activity/" + name, err => {
+            Ftp.put(req.files.image.data, "/activity/" + name, err => {
                 if (!err) {
-                    const filename = process.env.CDN_URL + "/images/activity/" + name + "?i=1";
+                    const filename = process.env.CDN_URL + "/cdn/images/activity/" + name;
                     req.body.image = filename;
                     callback(null, true);
                 } else {
@@ -107,7 +104,7 @@ exports.create = (req, res) => {
     })
 },
 
-exports.view = (req, res) => {
+    exports.view = (req, res) => {
         async.waterfall([
             function viewData(callback) {
                 activityModel.find()
@@ -136,4 +133,4 @@ exports.view = (req, res) => {
             }
             return output.print(req, res, result);
         })
-}
+    }
