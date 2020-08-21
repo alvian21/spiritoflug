@@ -30,4 +30,5 @@ router.use((req, res, next) => {
 
 router.post("/", roleController.grantAccess("createOwn","education"), educationController.create);
 router.get("/", roleController.grantAccess("readAny","education"), educationController.view);
+router.delete("/:id", roleController.grantAccess("deleteAny","education"), educationController.delete);
 module.exports = router;

@@ -135,12 +135,12 @@ exports.view = (req, res) => {
 exports.delete = (req, res) => {
     async.waterfall([
         function checkUser(callback) {
-            activityModel.findById({ _id: req.params.id })
+            educationModel.findById({ _id: req.params.id })
                 .lean().exec(function (err, result) {
                     if (err) {
                         return callback({
                             code: "INVALID_REQUEST",
-                            data: "activity not found"
+                            data: "education not found"
                         })
                     }
                     callback(null, result);
@@ -149,8 +149,8 @@ exports.delete = (req, res) => {
         },
 
         function deleteImage(result, callback) {
-            const imageName = result.image.replace("https://" + process.env.CDN_URL + "/cdn/images/activity/", "");
-            Ftp.raw("DELE", "/activity/" + imageName, err => {
+            const imageName = result.image.replace("https://" + process.env.CDN_URL + "/cdn/images/education/", "");
+            Ftp.raw("DELE", "/education/" + imageName, err => {
                 if (!err) {
                     callback(null, true);
                 } else {
@@ -163,13 +163,13 @@ exports.delete = (req, res) => {
 
         },
 
-        function deleteActivity(index, callback) {
-            activityModel.findByIdAndDelete({ _id: req.params.id })
+        function deleteEducation(index, callback) {
+            educationModel.findByIdAndDelete({ _id: req.params.id })
                 .lean().exec(function (err, result) {
                     if (!err) {
                         return callback({
                             code: "OK",
-                            data: "Activity has been deleted"
+                            data: "Education has been deleted"
                         })
                     } else {
                         return callback({
