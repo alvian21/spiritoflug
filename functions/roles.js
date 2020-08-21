@@ -4,6 +4,7 @@ const ac = new AccessControl();
 exports.roles = (function(){
     ac.grant("member")
     .readOwn("profile")
+    .readAny("education")
     .readAny("activity");
 
     ac.grant("admin")
@@ -11,7 +12,11 @@ exports.roles = (function(){
     .createOwn("activity")
     .readAny("activity")
     .updateAny("activity")
-    .deleteAny("activity");
+    .deleteAny("activity")
+    .createOwn("education")
+    .readAny("education")
+    .updateAny("education")
+    .deleteAny("education");
 
     return ac;
 })();
