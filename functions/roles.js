@@ -5,7 +5,8 @@ exports.roles = (function(){
     ac.grant("member")
     .readOwn("profile")
     .readAny("education")
-    .readAny("activity");
+    .readAny("activity")
+    .readAny("food");
 
     ac.grant("admin")
     .extend("member")
@@ -16,7 +17,11 @@ exports.roles = (function(){
     .createOwn("education")
     .readAny("education")
     .updateAny("education")
-    .deleteAny("education");
+    .deleteAny("education")
+    .createOwn("food")
+    .readAny("food")
+    .updateAny("food")
+    .deleteAny("food");
 
     return ac;
 })();
