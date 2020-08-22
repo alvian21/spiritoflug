@@ -52,6 +52,14 @@ const userSchema = new Schema({
     role:{
         type:String,
         default:"member"
+    },
+    latitude:{
+        type:String,
+        required:false,
+    },
+    longtitude:{
+        type:String,
+        required:false
     }
 });
 

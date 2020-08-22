@@ -24,7 +24,9 @@ exports.signUp = (req, res) => {
                 phoneNumber: req.body.phoneNumber,
                 gender: req.body.gender,
                 age: req.body.age,
-                indication: req.body.indication
+                indication: req.body.indication,
+                latitude: req.body.latitude,
+                longitude: req.body.longitude,
             });
 
             if (missingKeys.length !== 0) {
@@ -116,7 +118,9 @@ exports.signUp = (req, res) => {
                 gender: req.body.gender,
                 age: req.body.age,
                 indication: req.body.indication,
-                token: "not set token"
+                token: "not set token",
+                latitude: req.body.latitude,
+                longitude: req.body.longitude,
             }).then(res => {
                 if (res) {
                     return callback(null, {
