@@ -45,7 +45,6 @@ exports.signUp = (req, res) => {
             // Validation password
             const passwordRegx = /^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$/;
             const password = req.body.password;
-
             if (!password.match(passwordRegx)) {
                 return callback({
                     code: "INVALID_REQUEST",
