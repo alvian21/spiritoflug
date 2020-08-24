@@ -6,7 +6,9 @@ exports.roles = (function(){
     .readOwn("profile")
     .readAny("education")
     .readAny("activity")
-    .readAny("food");
+    .readAny("food")
+    .createOwn("chat")
+    .readAny("chat");
 
     ac.grant("admin")
     .extend("member")
@@ -21,7 +23,9 @@ exports.roles = (function(){
     .createOwn("food")
     .readAny("food")
     .updateAny("food")
-    .deleteAny("food");
+    .deleteAny("food")
+    .createOwn("chat")
+    .readAny("chat");
 
     return ac;
 })();
