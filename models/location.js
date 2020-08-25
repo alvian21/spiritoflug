@@ -14,6 +14,10 @@ const locationSchema = new Schema({
     longitude: {
         type: String,
         required: false
+    },
+    time: {
+        type: Date,
+        default: Date.now
     }
 });
 
