@@ -8,7 +8,8 @@ exports.roles = (function(){
     .readAny("activity")
     .readAny("food")
     .createOwn("chat")
-    .readAny("chat");
+    .readAny("chat")
+    .createOwn("location");
 
     ac.grant("admin")
     .extend("member")
@@ -25,7 +26,8 @@ exports.roles = (function(){
     .updateAny("food")
     .deleteAny("food")
     .createOwn("chat")
-    .readAny("chat");
+    .readAny("chat")
+    .readAny("location");
 
     return ac;
 })();
