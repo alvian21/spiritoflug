@@ -17,12 +17,29 @@ const checkImageExt = require("../functions/checkImageExt");
 
 exports.view = (req, res) => {
     async.waterfall([
-        function checkMissingKey(callback) {
-            // const io = req.app.locals.io;
-            // io.emit('message', req.body);
-            // res.status(200);
-            // io.emit("coba", { my: "Hello world" });
+        function getConversationId(callback) {
+            const user = req.user;
+            conversationModel.findOne({ user_id: user._id })
+                .then(conversation => {
+                    if (conversation) {
+                        req.body.conversation_id = conversation._id;
+                        callback(null, true);
+                    }
+                })
+        },
+
+        function getMessage(index, callback) {
+            messageModel.find({ conversation_id: req.body.conversation_id })
+                .then(res => {
+                    if (res) {
+                        return callback({
+                            code: "OK",
+                            data: res
+                        })
+                    }
+                })
         }
+
     ], (err, result) => {
         if (err) {
             return output.print(req, res, err);
@@ -36,10 +53,81 @@ exports.view = (req, res) => {
 exports.create = (req, res) => {
     async.waterfall([
         function checkMissingKey(callback) {
+            let missingKeys = [];
+            missingKeys = missingKey({
+                message: req.body.message
+            });
+
+            if (missingKeys.length !== 0) {
+                return callback({
+                    code: "MISSING_KEY",
+                    data: {
+                        missingKeys
+                    }
+                })
+            }
+            callback(null, true);
+        },
+
+        function checkIfHasConversation(index, callback) {
+            const user = req.user;
+            conversationModel.findOne({ user_id: user._id })
+                .then(res => {
+                        if(res){
+                           req.body.user_id = user._id; 
+                        }
+                        callback(null, true);
+                })
+        },
+
+        function getUserAdmin(index, callback) {
+            userModel.findOne({ role: "admin" })
+                .then(admin => {
+                    if (admin) {
+                        req.body.admin_id = admin._id;
+                        callback(null, true);
+                    }
+                })
+        },
+
+        function insertToConversationModel(index, callback) {
+            const user = req.user;
+            if(!req.body.user_id){
+                conversationModel.create({
+                    user_id: user._id,
+                    admin_id: req.body.admin_id
+                }).then(conversation => {
+                    if (conversation) {
+                        req.body.conversation_id = conversation._id;
+                        callback(null, true);
+                    }
+                })
+            }else{
+                conversationModel.findOne({ user_id: user._id })
+                .then(conversation => {
+                    if (conversation) {
+                        req.body.conversation_id = conversation._id;
+                        callback(null, true);
+                    }
+                })
+            }
+           
+        },
+
+        function insertToMessageModel(index, callback) {
             const io = req.app.locals.io;
-            io.emit('message', req.body);
-            res.status(200);
-            // io.emit("coba", { my: "Hello world" });
+            messageModel.create({
+                message: req.body.message,
+                conversation_id: req.body.conversation_id
+            }).then(res => {
+                if (res) {
+                    io.emit('message', req.body);
+                    return callback(null, {
+                        code: "OK",
+                        data: res
+                    })
+                }
+            })
         }
     ], (err, result) => {
         if (err) {
