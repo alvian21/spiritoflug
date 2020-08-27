@@ -41,10 +41,6 @@ fs.readdir("./routes", (err, files) => {
   files.map(route => {
     if (route.match(".js")) {
       app.use("/" + route.replace(".js", ""), require("./routes/" + route));
-      // const chatroute = route.replace(".js", "");
-      // if(chatroute == "chat"){
-      //   console.log(require("./routes/chat.js"));
-      // }
       if (n === lenX) {
         app.use((req, res, next) => {
           return output.print(req, res, {
