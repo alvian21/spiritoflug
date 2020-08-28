@@ -41,7 +41,7 @@ exports.create = (req, res) => {
             callback(null, true);
         }
 
-        function checkImageType(callback) {
+        function checkImageType(index, callback) {
             const decodeImage = Buffer.from(req.body.image, "base64");
             FileType.fromBuffer(decodeImage).then(response => {
                 if (response.mime == "image/jpg" || response.mime == "image/png" || response.mime == "image/jpeg") {
