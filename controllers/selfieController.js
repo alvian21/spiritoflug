@@ -39,7 +39,7 @@ exports.create = (req, res) => {
                 })
             }
             callback(null, true);
-        }
+        },
 
         function checkImageType(index, callback) {
             const decodeImage = Buffer.from(req.body.image, "base64");
