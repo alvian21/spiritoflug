@@ -19,6 +19,8 @@ const Ftp = new jsftp({
     user: process.env.FTP_USERNAME,
     pass: process.env.FTP_PASSWORD
 });
+const imageToBase64 = require('image-to-base64');
+const { response } = require('express');
 
 exports.create = (req, res) => {
     async.waterfall([
@@ -111,6 +113,7 @@ exports.view = (req, res) => {
                             code: "OK",
                             data: res
                         })
+                       
                     } else {
                         return callback({
                             code: "INVALID_REQUEST",

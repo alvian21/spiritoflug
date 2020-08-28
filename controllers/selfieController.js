@@ -9,10 +9,12 @@ const Speakeasy = require("speakeasy");
 const nodemailer = require("nodemailer");
 const handlebars = require("handlebars");
 const fs = require("fs");
+const FileType = require('file-type');
 const generateFileName = require('../functions/generateFileName');
 const moveFile = require("../functions/moveFile");
 const checkImageExt = require("../functions/checkImageExt");
 const jsftp = require("jsftp");
+const { response } = require('express');
 const Ftp = new jsftp({
     host: process.env.FTP_HOSTNAME,
     port: process.env.FTP_PORT,
@@ -22,26 +24,42 @@ const Ftp = new jsftp({
 
 exports.create = (req, res) => {
     async.waterfall([
-        function checkImage(callback) {
-            if (!(req.files && req.files.image)) {
+        function checkMissingKey(callback) {
+            let missingKeys=[];
+            missingKeys = missingKey({
+                image:req.body.image
+            });
+
+            if(missingKeys.length !== 0){
                 return callback({
-                    code: "INVALID_REQUEST",
-                    data: "Image file required"
-                });
-            } else {
-                callback(null, true);
+                    code:"MISSING_KEY",
+                    data:{
+                        missingKeys
+                    }
+                })
             }
+            callback(null, true);
+        }
+
+        function checkImageType(callback) {
+            const decodeImage = Buffer.from(req.body.image, "base64");
+            FileType.fromBuffer(decodeImage).then(response => {
+                if (response.mime == "image/jpg" || response.mime == "image/png" || response.mime == "image/jpeg") {
+                    req.body.ImageBuffer = decodeImage;
+                    req.body.ext = response.ext;
+                    callback(null, true);
+                } else {
+                    return callback({
+                        code: "INVALID_REQUEST",
+                        data: "Image type invalid"
+                    });
+                }
+            })
         },
 
         function mvImage(index, callback) {
-            if (!checkImageExt(req.files.image)) {
-                return callback({
-                    code: "INVALID_REQUEST",
-                    data: "Image type invalid"
-                });
-            }
-            const name = generateFileName(req.files.image);
-            Ftp.put(req.files.image.data, "/selfie/" + name, err => {
+            const name = Date.now().toString() + "." + req.body.ext;
+            Ftp.put(req.body.ImageBuffer, "/selfie/" + name, err => {
                 if (!err) {
                     const filename = "https://" + process.env.CDN_URL + "/cdn/images/selfie/" + name;
                     req.body.image = filename;

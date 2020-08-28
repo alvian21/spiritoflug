@@ -19,6 +19,7 @@ const Ftp = new jsftp({
     user: process.env.FTP_USERNAME,
     pass: process.env.FTP_PASSWORD
 });
+const imageToBase64 = require('image-to-base64');
 
 exports.create = (req, res) => {
     async.waterfall([
