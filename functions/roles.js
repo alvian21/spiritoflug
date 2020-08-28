@@ -9,6 +9,8 @@ exports.roles = (function(){
     .readAny("food")
     .createOwn("chat")
     .readAny("chat")
+    .readAny("youtube")
+    .createOwn("youtube")
     .createOwn("location")
     .createOwn("selfie");
 
@@ -27,6 +29,7 @@ exports.roles = (function(){
     .updateAny("food")
     .deleteAny("food")
     .createOwn("chat")
+    .readAny("youtube")
     .readAny("chat")
     .readAny("location")
     .readAny("selfie");
