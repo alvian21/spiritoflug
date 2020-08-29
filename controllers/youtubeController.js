@@ -24,7 +24,17 @@ const Ftp = new jsftp({
 
 exports.create = (req, res) => {
     async.waterfall([
-        function checkMissingKey(callback) {
+        function checkImage(callback) {
+            if (!(req.files && req.files.image)) {
+                return callback({
+                    code: "INVALID_REQUEST",
+                    data: "Image file required"
+                });
+            } else {
+                callback(null, true);
+            }
+        },
+        function checkMissingKey(index, callback) {
             let missingKeys = [];
             missingKeys = missingKey({
                 url: req.body.url,
@@ -40,11 +50,33 @@ exports.create = (req, res) => {
             }
             callback(null, true);
         },
+        function mvImage(index, callback) {
+            if (!checkImageExt(req.files.image)) {
+                return callback({
+                    code: "INVALID_REQUEST",
+                    data: "Image type invalid"
+                });
+            }
+            const name = generateFileName(req.files.image);
+            Ftp.put(req.files.image.data, "/youtube/" + name, err => {
+                if (!err) {
+                    const filename = "https://" + process.env.CDN_URL + "/cdn/images/youtube/" + name;
+                    req.body.image = filename;
+                    callback(null, true);
+                } else {
+                    return callback({
+                        code: "GENERAL_ERR",
+                        data: err
+                    })
+                }
 
+            })
+        },
         function insertToDb(index, callback) {
             youtubeModel.create({
                 url: req.body.url,
-                title: req.body.title
+                title: req.body.title,
+                image:  req.body.image
             }).then(res => {
                 if (res) {
                     return callback({
