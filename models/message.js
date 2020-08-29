@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const messageSchema = new Schema({
-    conversation_id: {
+    from_user_id:{
+        type: String,
+        required: true
+    },
+    to_user_id:{
         type: String,
         required: true
     },
