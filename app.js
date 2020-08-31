@@ -14,7 +14,8 @@ const output = require("./functions/output");
 const mongoose = require('mongoose');
 const app = express();
 const server = http.createServer(app);
-const io =  socketio(server);
+const io = socketio(server);
+const expressLayouts = require('express-ejs-layouts');
 
 const uri = process.env.MONGO_HOST;
 mongoose.connect(uri, { useNewUrlParser: true, useCreateIndex: true });
@@ -27,17 +28,20 @@ connection.once('open', () => {
 
 app.use(upload());
 // app.use(express.static(__dirname));
+app.set('views', path.join(__dirname, 'views'));
+app.use(require('ejs-yield'));
+app.set('view engine', 'ejs');
+app.use(expressLayouts);
+app.engine('ejs', require('express-ejs-extend'));
 app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.json({ limit: process.env.JSON_LIMIT }));
 app.use(bodyParser.urlencoded({ extended: true }));
-
-
+app.use(express.static(path.join(__dirname, 'public')));
 
 fs.readdir("./routes", (err, files) => {
   var len = files.length;
   var lenX = len - 1;
   var n = 0;
- 
   files.map(route => {
     if (route.match(".js")) {
       app.use("/" + route.replace(".js", ""), require("./routes/" + route));
