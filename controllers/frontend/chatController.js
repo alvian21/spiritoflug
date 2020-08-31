@@ -16,7 +16,7 @@ exports.index = (req, res) => {
         function returnToIndex(callback) {
             userModel.find({ role: { $ne: "admin" } }).then(user => {
                 if (user) {
-                    res.render("member/index", {
+                    res.render("chat/index", {
                         users: user
                     });
                 }

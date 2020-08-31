@@ -30,6 +30,7 @@ app.use(upload());
 // app.use(express.static(__dirname));
 app.set('views', path.join(__dirname, 'views'));
 app.use(require('ejs-yield'));
+app.set("layout extractScripts", true)
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.engine('ejs', require('express-ejs-extend'));
