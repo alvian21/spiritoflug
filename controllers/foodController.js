@@ -38,7 +38,7 @@ exports.create = (req, res) => {
             let missingKeys = [];
             missingKeys = missingKey({
                 title: req.body.title,
-                link: req.body.title,
+                link: req.body.link,
                 category: req.body.category,
                 description: req.body.description,
             });
@@ -80,7 +80,7 @@ exports.create = (req, res) => {
         function insert(index, callback) {
             foodModel.create({
                 title: req.body.title,
-                link: req.body.title,
+                link: req.body.link,
                 category: req.body.category,
                 description: req.body.description,
                 image: req.body.image

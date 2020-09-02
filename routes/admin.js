@@ -8,5 +8,6 @@ const chatController = require("../controllers/frontend/chatController");
 
 router.get("/", dashboardController.index);
 router.get("/member", memberController.index);
+router.get("/member/:id", memberController.detail);
 router.get("/chat", chatController.index);
 module.exports = router;

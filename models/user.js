@@ -56,10 +56,12 @@ const userSchema = new Schema({
     latitude:{
         type:String,
         required:false,
+        default:""
     },
     longitude:{
         type:String,
-        required:false
+        required:false,
+        default:""
     }
 });
 

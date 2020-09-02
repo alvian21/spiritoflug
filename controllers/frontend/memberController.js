@@ -1,4 +1,5 @@
 const userModel = require('../../models/user');
+const locationModel = require('../../models/location');
 const async = require("async");
 const output = require("../../functions/output");
 const missingKey = require("../../functions/missingKey");
@@ -20,6 +21,33 @@ exports.index = (req, res) => {
                         users: user
                     });
                 }
+            })
+
+        }
+    ], (err, result) => {
+        if (err) {
+            return output.print(req, res, err);
+        }
+        return output.print(req, res, result);
+    })
+}
+
+exports.detail = (req, res) => {
+    async.waterfall([
+        function returnToIndex(callback) {
+            userModel.findOne({ role: { $ne: "admin" }, _id: req.params.id }, function (err, user) {
+                locationModel.findOne({user_id: req.params.id}).sort({ time: -1 }).then(latlocation => {
+                    if(latlocation==null){
+                        latlocation = [];
+                    }
+                    res.render("member/detail", {
+                        user: user,
+                        location: latlocation
+                    });
+                })
+               
+
+                // console.log(user._id.toString());
             })
 
         }
