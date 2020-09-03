@@ -15,7 +15,9 @@ const readHTMLFile = require("../../functions/readHTMLFile");
 exports.index = (req, res) => {
     async.waterfall([
         function returnToIndex(callback){
-            res.render("index");
+            res.render("index", {
+                url:""
+            });
         }
     ])
 }

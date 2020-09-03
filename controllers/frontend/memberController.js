@@ -18,7 +18,8 @@ exports.index = (req, res) => {
             userModel.find({ role: { $ne: "admin" } }).then(user => {
                 if (user) {
                     res.render("member/index", {
-                        users: user
+                        users: user,
+                        url:""
                     });
                 }
             })
@@ -42,7 +43,8 @@ exports.detail = (req, res) => {
                     }
                     res.render("member/detail", {
                         user: user,
-                        location: latlocation
+                        location: latlocation,
+                        url:""
                     });
                 })
                

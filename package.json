@@ -23,6 +23,7 @@
     "express-ejs-extend": "0.0.1",
     "express-ejs-layouts": "^2.5.0",
     "express-fileupload": "^1.1.10",
+    "express-session": "^1.17.1",
     "file-type": "^15.0.0",
     "handlebars": "^4.7.6",
     "image-to-base64": "^2.1.1",

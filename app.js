@@ -15,6 +15,7 @@ const mongoose = require('mongoose');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 
 const uri = process.env.MONGO_HOST;
@@ -33,6 +34,15 @@ app.use(require('ejs-yield'));
 app.set("layout extractScripts", true)
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: "HELLO WORLD",
+  cookie: {
+    maxAge: 1000 * 60 * 60,
+    sameSite: true,
+  }
+}))
 app.engine('ejs', require('express-ejs-extend'));
 app.use("/uploads", express.static("uploads"));
 app.use(bodyParser.json({ limit: process.env.JSON_LIMIT }));

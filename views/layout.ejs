@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <!-- Icons -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
-  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-  crossorigin=""/>
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin="" />
   <link rel="stylesheet" href="/assets/vendor/nucleo/css/nucleo.css" type="text/css">
   <link rel="stylesheet" href="/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
   <!-- Page plugins -->
@@ -38,18 +38,26 @@
   <link rel="stylesheet" href="/assets/css/argon.css?v=1.2.0" type="text/css">
 </head>
 
-<body>
+<body  <% if(url=="/admin/login") {  %> class="bg-default" <% } %>>
   <!-- Sidenav -->
-  <%- include("./include/sidebar") -%> 
+  <% if(url!="/admin/login") { %>
+  <%- include("./include/sidebar") -%>
+  <% } %>
   <!-- Main content -->
+  <% if(url!="/admin/login") { %>
   <div class="main-content" id="panel">
+    <% } %>
     <!-- Topnav -->
-    <%- include('./include/navbar') -%> 
+    <% if(url!="/admin/login") { %>
+    <%- include('./include/navbar') -%>
+    <% } %>
     <!-- Header -->
     <!-- Header -->
     <%- body %>
-      <!-- Footer -->
+    <!-- Footer -->
+    <% if(url!="/admin/login") { %>
   </div>
+  <% } %>
   <!-- Argon Scripts -->
   <!-- Core -->
   <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>

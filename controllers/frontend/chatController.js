@@ -17,7 +17,8 @@ exports.index = (req, res) => {
             userModel.find({ role: { $ne: "admin" } }).then(user => {
                 if (user) {
                     res.render("chat/index", {
-                        users: user
+                        users: user,
+                        url:""
                     });
                 }
             })
