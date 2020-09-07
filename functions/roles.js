@@ -10,6 +10,7 @@ exports.roles = (function(){
     .createOwn("chat")
     .readAny("chat")
     .readAny("youtube")
+    .createOwn("emergency")
     .createOwn("youtube")
     .createOwn("location")
     .createOwn("selfie");
@@ -32,6 +33,7 @@ exports.roles = (function(){
     .readAny("youtube")
     .readAny("chat")
     .readAny("location")
+    .readAny("emergency")
     .readAny("selfie");
 
     return ac;
