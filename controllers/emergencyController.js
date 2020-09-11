@@ -66,7 +66,13 @@ exports.view = (req, res) => {
                    }
                 })
             });
+        },
+        
+        function returnView(user,callback){
+            console.log(user);
         }
+
+
 
        
     ], (err, result) => {
