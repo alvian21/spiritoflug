@@ -59,22 +59,26 @@ exports.view = (req, res) => {
         },
 
         function loopData(data, callback) {
+            let datauser = [];
             data.forEach(element => {
                 userModel.findById({ _id: element._id }).then(user => {
-                   if(user){
-                       callback(null, user);
-                   }
+                    if (user) {
+                        datauser.push(user);
+                        if (datauser.length == data.length) {
+                            callback(null, datauser);
+                        }
+                    }
+                }).catch(function (err) {
+                    console.log('err', err)
                 })
+
             });
         },
-        
-        function returnView(user,callback){
-            console.log(user);
+
+
+        function viewToIndex(datauser, callback) {
+            console.log(datauser);
         }
-
-
-
-       
     ], (err, result) => {
         if (err) {
             return output.print(req, res, err);
