@@ -1,4 +1,5 @@
 const emergencyModel = require('../models/emergency');
+const userModel = require('../models/user');
 const async = require("async");
 const output = require("../functions/output");
 const missingKey = require("../functions/missingKey");
@@ -47,26 +48,26 @@ exports.create = (req, res) => {
 exports.view = (req, res) => {
     async.waterfall([
         function viewData(callback) {
-            emergencyModel.find()
-                .then(res => {
-                    if (res) {
-                        return callback({
-                            code: "OK",
-                            data: res
-                        })
-                       
-                    } else {
-                        return callback({
-                            code: "INVALID_REQUEST",
-                            data: "NOT FOUND"
-                        })
-                    }
-                }).catch(err => {
-                    return callback({
-                        code: "ERR_DATABASE",
-                        data: err
-                    });
-                });
+            let emergency = [];
+            emergencyModel.aggregate([{ "$group": { _id: "$user_id", count: { $sum: 1 } } }]).then(res => {
+
+                Promise.all(res.map()).then(res => {
+                    console.log(res);
+                })
+                // if (res) {
+                //     let x = {};
+                //     emergency.push(res);
+                //     // res.forEach(element => {
+                //     //     userModel.findById({ _id: element._id }).then(data => {
+                //     //         emergency.push(x);
+                //     //     })
+                //     // });
+
+
+
+                // }
+            })
+
         }
     ], (err, result) => {
         if (err) {
