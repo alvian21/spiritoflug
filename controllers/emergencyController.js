@@ -49,26 +49,26 @@ exports.view = (req, res) => {
     async.waterfall([
         function viewData(callback) {
             let emergency = [];
-            emergencyModel.aggregate([{ "$group": { _id: "$user_id", count: { $sum: 1 } } }]).then(res => {
+            emergencyModel.aggregate([{ "$group": { _id: "$user_id", count: { $sum: 1 } } }]).then(data => {
+                if (data) {
+                    callback(null, data);
+                }
 
-                Promise.all(res.map()).then(res => {
-                    console.log(res);
-                })
-                // if (res) {
-                //     let x = {};
-                //     emergency.push(res);
-                //     // res.forEach(element => {
-                //     //     userModel.findById({ _id: element._id }).then(data => {
-                //     //         emergency.push(x);
-                //     //     })
-                //     // });
-
-
-
-                // }
             })
 
+        },
+
+        function loopData(data, callback) {
+            data.forEach(element => {
+                userModel.findById({ _id: element._id }).then(user => {
+                   if(user){
+                       callback(null, user);
+                   }
+                })
+            });
         }
+
+       
     ], (err, result) => {
         if (err) {
             return output.print(req, res, err);
